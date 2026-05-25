@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVX Studio®</title>
+  <style>
+    @font-face {
+      font-family: 'TASAOrbiter';
+      src: url('https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/TASAOrbiter-VariableFont_wght.ttf') format('truetype');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'SnellRoundhand';
+      src: url('https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/snellroundhand_bold.otf') format('opentype');
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f4f3ef;
+      --fg: #0d0d0d;
+      --fg-muted: #999;
+      --border: rgba(0,0,0,0.10);
+      --nav-h: 56px;
+      --base: 'TASAOrbiter', sans-serif;
+      --script: 'SnellRoundhand', cursive;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--base);
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Cursor ── */
+    #cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--fg);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .18s, height .18s;
+      mix-blend-mode: difference;
+    }
+    #cursor.big { width: 30px; height: 30px; }
+
+    /* ── Navbar ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 500;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 32px;
+      border-bottom: 0.5px solid var(--border);
+      background: rgba(244,243,239,0.88);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-left {
+      font-family: var(--script);
+      font-size: 17px;
+      letter-spacing: 0.01em;
+      cursor: none;
+    }
+
+    .nav-center { text-align: center; }
+    .nav-studio {
+      font-family: var(--base);
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+    .nav-meta {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 3px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+    }
+
+    .nav-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-contact {
+      font-family: var(--base);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--fg);
+      color: var(--bg);
+      border: none;
+      padding: 8px 22px;
+      border-radius: 100px;
+      cursor: none;
+      transition: opacity .2s;
+    }
+    .btn-contact:hover { opacity: 0.8; }
+
+    .dots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 3px);
+      gap: 3px;
+    }
+    .dots-grid span {
+      width: 3px; height: 3px;
+      background: var(--fg);
+      border-radius: 50%;
+    }
+
+    /* ── Contact Panel ── */
+    .contact-panel {
+      position: fixed;
+      top: var(--nav-h);
+      right: 0;
+      width: 370px;
+      background: #141414;
+      color: #fff;
+      padding: 32px 36px 36px;
+      z-index: 490;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .25s, transform .25s;
+    }
+    .contact-panel.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    .cp-title {
+      font-family: var(--script);
+      font-size: 26px;
+      margin-bottom: 28px;
+    }
+    .cp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 0.5px solid rgba(255,255,255,0.12);
+      font-size: 13px;
+      font-weight: 300;
+    }
+    .cp-row:last-of-type { border-bottom: 0.5px solid rgba(255,255,255,0.12); }
+    .cp-label { color: rgba(255,255,255,0.4); }
+    .cp-socials {
+      display: flex;
+      gap: 28px;
+      padding-top: 20px;
+    }
+    .cp-socials a {
+      font-family: var(--script);
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .cp-socials a:hover { color: #fff; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* MVX letters — fixed to viewport edges, vertically centred */
+    .letter {
+      position: absolute;
+      font-family: var(--base);
+      font-weight: 500;
+      font-size: clamp(180px, 25vw, 380px);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      top: 50%;
+      transform: translateY(-45%);
+      user-select: none;
+      z-index: 1;
+    }
+    .letter-M { left: -0.01em; }
+    .letter-V { left: 50%; transform: translateX(-50%) translateY(-45%); z-index: 1; }
+    .letter-X { right: -0.01em; }
+
+    /* Floating images — sit above letters */
+    .fi {
+      position: absolute;
+      overflow: hidden;
+      z-index: 3;
+      border-radius: 2px;
+      will-change: transform;
+    }
+    .fi img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Exact positions based on Figma 1440px frame */
+    /* Top-left: Vessel (storage cart) */
+    .fi-vessel {
+      top: calc(var(--nav-h) + 5%);
+      left: 3%;
+      width: 15%;
+      aspect-ratio: 3/4;
+    }
+    /* Centre: NOSSO charger — large, overlaps V */
+    .fi-nosso {
+      top: calc(var(--nav-h) + 2%);
+      left: 31.5%;
+      width: 24%;
+      aspect-ratio: 9/10;
+    }
+    /* Top-right: TRI41 purple gadget */
+    .fi-tri41 {
+      top: calc(var(--nav-h) + 4%);
+      right: 3%;
+      width: 14%;
+      aspect-ratio: 4/3;
+    }
+    /* Mid-right: RAX backpack */
+    .fi-rax {
+      top: calc(var(--nav-h) + 38%);
+      right: 3%;
+      width: 17%;
+      aspect-ratio: 3/4;
+    }
+    /* Bottom-left: Pen Pouch */
+    .fi-pen {
+      bottom: 6%;
+      left: 8%;
+      width: 20%;
+      aspect-ratio: 2/1;
+    }
+    /* Bottom-centre: Disc Stylus */
+    .fi-disc {
+      bottom: 4%;
+      left: 51.5%;
+      width: 14%;
+      aspect-ratio: 1/2;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 52px 32px 44px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .footer-nav {
+      display: flex;
+      gap: 44px;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+    .footer-nav a {
+      color: var(--fg);
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .footer-nav a:hover { opacity: 0.45; }
+
+    .footer-right {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      grid-template-rows: auto auto;
+      column-gap: 24px;
+      row-gap: 6px;
+      text-align: right;
+    }
+    .footer-right a {
+      font-family: var(--script);
+      font-size: 13px;
+      color: var(--fg);
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .footer-right a:hover { opacity: 0.45; }
+    .footer-email {
+      grid-column: 1 / -1;
+      text-align: left;
+      font-family: var(--base);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-left">menu</div>
+  <div class="nav-center">
+    <div class="nav-studio">MVX Studio®</div>
+    <div class="nav-meta">
+      <span id="nd"></span>
+      <span id="nt"></span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-contact" id="contactBtn">Contact</button>
+    <div class="dots-grid" aria-hidden="true">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- CONTACT PANEL -->
+<div class="contact-panel" id="contactPanel">
+  <div class="cp-title">Contact</div>
+  <div class="cp-row">
+    <span class="cp-label">Email</span>
+    <span>xxchloen@gmail.com</span>
+  </div>
+  <div class="cp-socials">
+    <a href="#">Linkedin</a>
+    <a href="#">Behance</a>
+    <a href="#">Instagram</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="letter letter-M">M</span>
+  <span class="letter letter-V">V</span>
+  <span class="letter letter-X">X</span>
+
+  <div class="fi fi-vessel">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home-Index_Vessel.jpg" alt="Vessel" />
+  </div>
+  <div class="fi fi-nosso">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home-Index_NOSSO.jpg" alt="NOSSO" />
+  </div>
+  <div class="fi fi-tri41">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home-Index_TRI41.jpg" alt="TRI41" />
+  </div>
+  <div class="fi fi-rax">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home-Index_RAX.jpg" alt="RAX" />
+  </div>
+  <div class="fi fi-pen">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home-Index_Pen Pouch.jpg" alt="Pen Pouch" />
+  </div>
+  <div class="fi fi-disc">
+    <img src="https://raw.githubusercontent.com/xxchloen/mvx-portfolio/main/Home_Disc Stylud Insert.jpg" alt="Disc Stylus" />
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <nav class="footer-nav">
+    <a href="#">About</a>
+    <a href="#">Project</a>
+    <a href="#">Contact</a>
+  </nav>
+  <div class="footer-right">
+    <a href="#">Linkedin</a>
+    <a href="#">Behance</a>
+    <a href="#">Instagram</a>
+    <a href="#" class="footer-email">Email &nbsp;&nbsp; xxchloen@gmail.com</a>
+  </div>
+</footer>
+
+<script>
+  // Live clock
+  function tick() {
+    const n = new Date(), p = v => String(v).padStart(2,'0');
+    document.getElementById('nd').textContent = `${n.getFullYear()} ${p(n.getMonth()+1)} ${p(n.getDate())}`;
+    document.getElementById('nt').textContent = `CST ${p(n.getHours())}:${p(n.getMinutes())}`;
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Custom cursor
+  const cur = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .fi').forEach(el => {
+    el.addEventListener('mouseenter', () => cur.classList.add('big'));
+    el.addEventListener('mouseleave', () => cur.classList.remove('big'));
+  });
+
+  // Contact toggle
+  const cBtn = document.getElementById('contactBtn');
+  const cPanel = document.getElementById('contactPanel');
+  cBtn.addEventListener('click', e => { e.stopPropagation(); cPanel.classList.toggle('open'); });
+  document.addEventListener('click', () => cPanel.classList.remove('open'));
+
+  // Parallax
+  const fis = document.querySelectorAll('.fi');
+  document.addEventListener('mousemove', e => {
+    const mx = e.clientX / window.innerWidth  - 0.5;
+    const my = e.clientY / window.innerHeight - 0.5;
+    fis.forEach((el, i) => {
+      const d = (i % 3 + 1) * 6;
+      el.style.transform = `translate(${mx*d}px, ${my*d}px)`;
+    });
+  });
+</script>
+</body>
+</html>
